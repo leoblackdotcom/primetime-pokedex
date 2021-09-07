@@ -1,6 +1,761 @@
+@require('_index.styl')
+
+body
+    background #1b1b1b url(https://pro-primetime-pokemon.local/wp-content/uploads/2021/09/bg-main-ltr-2.jpg) no-repeat 50% 50%
+    background-size cover
+
+#page
+    background-color #fff
+
+#content
+    background #f4f4f4 url(https://pro-primetime-pokemon.local/wp-content/uploads/2021/09/bg-content-ltr-2d.jpg) repeat 0 0
+    background-size 75% auto
+
 .storefront-breadcrumb
     display: none
-h1.poke-title sup
-    opacity: .5
-.evol-link-image
-    background-size: cover
+
+a.button.no-margin
+    margin 0
+.btn, a.btn, .button, a.button, button, input[type="submit"], input[type="button"], input[type="reset"]
+    border 1px solid #000
+    border-bottom-width 2px
+    &.btn-small
+        font-size 60%
+    &:focus,
+    &:active
+        outline 0
+        color #fff
+
+.centered 
+    display block
+    margin-left auto
+    margin-right auto
+    text-align center
+    padding-bottom 60px
+.poke-weaks
+    margin-top -20px
+    h3
+        font-weight 300!important
+        font-size 18px!important
+        line-height 30px!important
+        letter-spacing .5px
+    ul
+        &.poke-pills
+            li
+                font-size 20px
+                line-height 28px
+                padding 2px 4px 0
+                border-radius 6px
+                margin-right 4px
+                span
+                    padding 0 12px
+                .icon
+                    display none
+
+ul
+    &.clean-list
+        margin 0
+        padding 0
+        & > li
+            list-style-type none
+    &.inline-list
+        box(flex row wrap, start start, 1)
+
+    &.poke-pills
+        box(flex row wrap, start start)
+        li
+            box(flex row nowrap, start center, 30px 1)
+            text-align center
+            //min-width 46%
+            margin 5px 10px 5px 5px
+            font-size 28px
+            font-family "Karantina"
+            text-transform uppercase
+            position relative
+            line-height 36px
+            border-radius 20px 6px 6px 20px
+            overflow hidden
+            letter-spacing .5px
+            padding 0 0 2px 3px
+            border 1px solid cast(black)
+            border-width 1px 1px 2px 1px
+            //text-shadow 0 1px 0 cast(black 25%)
+            &:before
+                content ""
+                bottom 0
+                left 0
+                width 100%
+                height 3px
+                position absolute
+                background-color cast(black 10%)
+            &:after
+                content ""
+                top 0
+                left 0
+                width 100%
+                height 3px
+                position absolute
+                background-color cast(white 20%)
+            &.ice,
+            &.electric
+                text-shadow none
+                span
+                    color cast(black 77%)
+                .icon
+                    svg
+                        color cast(black 77%)
+                    border-color cast(black 80%)
+            span
+                color #fff
+                //text-shadow -1px 2px 0 cast(black 100%)
+                padding 1px 18px 0 10px
+            .icon
+                position relative
+                min-width 40px
+                height 20px
+                margin-top 3px
+                margin-left -2px
+                svg
+                    color cast(white)
+                    max-width 22px
+                    max-height 22px
+                    position absolute
+                    top 50% 
+                    left 50%
+                    transform translate(-50%, -50%)
+
+#pokedex
+    hug(90%)
+    max-width 1200px
+    padding-top 60px
+    //background #fff
+
+#pokenav
+    box(flex row nowrap, center center stretch, 200px 1 200px)
+    text-align center
+    margin-bottom 40px
+    padding 0 100px
+    & > .pokenav-link
+        min-height 100px
+        position relative
+        box(flex column, center start)
+        &.pokenav-right
+            align-items flex-end
+        a
+            width 60px
+            height 60px
+            display block
+            position relative
+            border-radius 6px
+            transition border-color .3s, background-color .3s
+            &.poke-nav-left
+                &:hover,
+                &:active
+                    .arrow-button
+                        margin-left -6px
+            &.poke-nav-right
+                &:hover,
+                &:active
+                    .arrow-button
+                        margin-left 6px
+            &:before
+                content ""
+                position absolute
+                top 0
+                left 60%
+                right -60%
+                bottom 0
+                display block
+                z-index 2
+            &.poke-nav-left
+                &:before
+                    left -60%
+                    right 60%
+                .arrow-button
+                    left 0
+                    transform translate(-60%, -50%) scaleY(-1)
+            .arrow-button
+                position absolute
+                top 50%
+                left 100%
+                transform translate(-40%, -50%)
+                font-size 48px
+                z-index 1
+                transition margin .3s
+                //opacity .5
+            .poke-nav-thumb
+                width 100%
+                height 100%
+                display block
+                background-size contain
+                background-position 50% 50%
+                background-repeat no-repeat
+                border-radius 6px
+                position relative
+                z-index 3
+            .poke-nav-name
+                position absolute
+                top -10px
+                left 50%
+                //margin-top 30px
+                margin-left -5px
+                transform translate(-50%, -50%)
+                padding 2px 4px
+                //background cast(black 60%)
+                border-radius 3px
+                font-size 14px
+                font-weight bold
+                //color #fff
+                opacity .3
+                text-transform capitalize
+                z-index 2
+    .poke-current
+        padding 10px
+        .poke-add
+            padding-top 4px
+            display block
+            font-style italic
+        .poke-name
+            font-family Karantina
+            font-size 36px
+            font-weight 300
+            //padding-bottom 6px
+            display block
+            line-height 36px
+            margin-bottom -5px
+            sup
+                font-weight 300
+        .poke-id
+            font-size 24px
+            line-height 24px
+            //font-style italic
+            //font-weight bold
+            //opacity .3
+            letter-spacing .5px
+            display block
+            padding-right 8px
+            b
+                font-weight 700
+#pokemon
+    border-radius 20px
+    padding 20px
+    position relative
+    .poke-flip
+        cursor pointer
+    .swap-button
+        position absolute
+        top 18px
+        left 18px
+        z-index 10
+        //transform translateX(-50%)
+        line-height 42px
+        height 42px
+        width 30px
+        text-align center
+        display inline-block
+        padding 0 3px
+        //background #005aa4
+        background #000
+        color #eee
+        border-radius 50% 50% 50% 50% / 60% 60% 40% 40%
+        font-size 15px
+        transition background-color 0.3s
+        border 2px solid #000
+        border-width 1px 1px 2px
+        //pointer-events none
+        cursor pointer
+        transition transform 0.3s
+        transform translateZ(200px) rotate(0deg)
+        svg
+            transition transform 0.3s
+        &:hover
+            background #222
+        &.activate
+            background #222
+            transform translateZ(200px) rotate(90deg)
+            //border-color yellow
+            svg
+                color cast(white 50%)
+                transform rotate(-90deg)
+    .poke-profile
+        box(flex row wrap, space-between start, 50% 47% 100%)
+    .poke-summary
+        padding-top 40px
+    .poke-image
+        margin-bottom 30px
+        perspective 2000px
+        transform-style preserve-3d
+        &.activate
+            .poke-image-description
+                transform rotateY(180deg)
+            .poke-image-placeholder
+                transform rotateY(180deg)
+        .poke-image-description
+            position absolute
+            top 0
+            left 0
+            width 100%
+            min-height 500px
+            //outline 2px solid blue
+            display block
+            //padding 40px
+            background #000
+            transform rotateY(0deg)
+            transition transform .5s ease
+            border-radius 10px
+            border 1px solid #000
+            border-width 0 1px 2px 1px
+            overflow hidden
+            color #fff
+            //margin-bottom 60px
+            .pid-section
+                padding 35px 40px
+            .poke-stats-bar-fill
+                background linear-gradient(180deg, rgba(0,0,0,0%), rgba(0,0,0,10%))
+            h3
+                font-size 32px
+                font-family Karantina
+                font-weight bold
+                text-shadow -1px 2px 0 cast(black 70%)
+                -webkit-text-stroke-width: 1px;
+                -webkit-text-stroke-color: cast(black 75%);
+                color #fff
+            ul.poke-details-list li
+                text-shadow -1px 1px 0px cast(black 20%), 0 2px 3px cast(black 20%)
+                margin-bottom 8px
+            p
+                //font-family Karantina
+                //font-size 28px
+                //line-height 24px
+                //font-weight 300
+                //letter-spacing .5px
+                background-color cast(white)
+                color #000
+                border-radius 6px
+                padding 15px 20px
+                text-shadow -1px 1px 0px cast(black 10%), 0 2px 3px cast(black 10%)
+                //font-size 15px
+                font-weight 500
+                border 1px solid black
+                border-bottom-width 2px
+                span
+                    text-shadow none
+                    font-weight 300
+                    opacity .4
+                svg
+                    font-size 15px
+                    opacity .4
+            & > *
+                transform scaleX(-1)
+            &:before
+                content ""
+                position absolute
+                top 0
+                left 0
+                bottom 0
+                right 0
+                //background-color cast(black 50%)
+
+        .poke-image-placeholder
+            box(flex row nowrap, center stretch)
+            position relative
+            z-index 1
+            text-align center
+            overflow hidden
+            border-radius 10px
+            box-shadow inset 0 0 40px rgba(0,0,0,.15)
+            border 1px solid #000
+            border-width 0 1px 2px 1px
+            min-height 500px
+            transition transform .5s ease
+            backface-visibility hidden
+            margin-bottom 60px
+            .poke-stats
+                & > ul li 
+                        .poke-stats-bar-fill span
+                            opacity .5
+                        .poke-stats-hp,
+                        .poke-stats-atk,
+                        .poke-stats-def,
+                        .poke-stats-satk,
+                        .poke-stats-sdef,
+                        .poke-stats-spd
+                            &:after
+                                content none
+                            &:before
+                                content ""
+                                width: 100%
+                                height 30px
+                                background linear-gradient(0deg, rgba(255,255,255,0), rgba(255,255,255,.3))
+                            background cast(white 20%)
+                            border 1px solid white
+                            border-bottom 0
+            h1,h2
+                font-family Karantina
+                //font-weight 300
+                letter-spacing 1px
+                font-size 48px
+                line-height 42px
+                margin 10px 0 0
+                -webkit-text-stroke-width: 1px;
+                -webkit-text-stroke-color: cast(black 75%);
+                text-shadow -1px 2px 0 cast(black 70%)
+                color #fff
+            .poke-overview
+                color #fff
+                position absolute
+                top 20px
+                left 6%
+                font-family Karantina
+                text-align left
+                width 88%
+                .poke-add
+                    font-size 24px
+                    display inline-block
+                    color #000
+                    font-weight 300
+                .poke-id
+                    position absolute
+                    top 0
+                    right 0
+                    font-size 90px
+                    font-weight 400
+                    line-height 90px
+                    -webkit-text-stroke-width: 1px;
+                    -webkit-text-stroke-color: cast(black 75%);
+                    text-shadow -1px 2px 0 cast(black 70%)
+                    sup
+                        color #000
+                        text-shadow none
+                        -webkit-text-stroke-width: 0;
+                        position absolute
+                        top 20px
+                        left -12px
+                        z-index -1
+                        font-size 45px
+                        font-weight 300
+            .poke-cat
+                font-size 24px
+                font-weight 400
+                padding-left 2px
+                color #000
+                text-shadow 0 0 24px cast(white 20%)
+            img
+                margin 130px 60px 90px
+                max-width 360px
+                max-height 360px
+                width 100%
+        .poke-stats
+            position absolute
+            bottom 0
+            left 0
+            right 0
+            width 100%
+            z-index -1
+            height 100%
+            max-height 300px
+            & > ul
+                box(flex row wrap, start stretch, 1)
+                height 100%
+                width 101%
+                margin-left -.5%
+                li
+                    box(flex column nowrap, end center)
+                    position relative
+                    //text-shadow 0 2px 3px cast(black 10%)
+                    .poke-stats-bar-fill
+                        height 100%
+                        width 96%
+                        //background linear-gradient(180deg, rgba(0,0,0,0%), rgba(0,0,0,10%))
+                        position relative
+                        span
+                            width 100%
+                            position absolute
+                            bottom 0
+                            left 0
+                            border-right 2px solid cast(white 5%)
+                            //border 1px solid transparent
+                            &:before
+                                content ""
+                                display block
+                                top 0
+                                left 0
+                                width 100%
+                                height 4px
+                                background-color cast(white 10%)
+                            &:after
+                                content ""
+                                display block
+                                top 0
+                                left 0
+                                width 2px
+                                height 100%
+                                background-color cast(black 2%)
+                    .poke-stats-item-amount
+                        height 20px
+                        line-height 20px
+                        font-size 36px
+                        letter-spacing 1px
+                        font-weight bold
+                        color white
+                        position absolute
+                        bottom 36px
+                        left 0
+                        width 100%
+                        text-align center
+                        text-shadow -1px 2px 0 cast(black 70%)
+                        -webkit-text-stroke-width: 1px;
+                        -webkit-text-stroke-color: cast(black 75%);
+                        font-family "Karantina"
+                    .poke-stats-item-title
+                        height 24px
+                        line-height 28px
+                        font-size 20px
+                        letter-spacing .5px
+                        font-weight 400
+                        //font-weight bold
+                        //border 2px solid rgba(0,0,0,1)
+                        //border-width .5px 1px 2px 2px
+                        position absolute
+                        bottom 8px
+                        left 20%
+                        width 60%
+                        text-align center
+                        color #000
+                        //text-shadow -1px 1px 0 cast(black 100%)
+                        //color cast(black 60%)
+                        //background linear-gradient(0deg, rgba(0,0,0,.1), rgba(0,0,0,.2))
+                        //background rgba(255,255,255,.8)
+                        border-radius 12px
+                        font-family "Karantina"
+
+                    .poke-stats-hp
+                        background cast(#D45F5F 100%)
+                    .poke-stats-atk
+                        background cast(#9D9FE9 100%)
+                    .poke-stats-def
+                        background cast(#D7D4A1 600 100%)
+                    .poke-stats-satk
+                        background cast(#8082D6 100%)
+                    .poke-stats-sdef
+                        background cast(#B7B48E 100%)
+                    .poke-stats-spd
+                        background cast(#65D53D 600 100%)
+    .poke-card
+        border-radius 10px
+        //overflow hidden
+        //background-color cast(black 5%)
+        background-color cast(white 50%)
+        backdrop-filter blur(4px)
+        padding 20px
+        margin-bottom 60px
+        position relative
+        border 1px solid #000
+        border-bottom-width 2px
+        &.poke-card-clean
+            background none
+            border none
+            padding 6px 0 0
+        &.poke-card-half
+            display inline-block
+            width 47%
+        &.poke-description
+            p
+                font-weight 500
+                font-size 18px
+                svg
+                    opacity .3
+                span
+                    opacity .15
+            h3
+                //background #fff
+                z-index 2
+
+        h3
+            font-size 24px
+            font-weight bold
+            position absolute
+            top -26px
+            left 0px
+            //opacity .5
+            text-transform uppercase
+            font-family "Karantina"
+            font-weight 400
+
+        &.poke-details
+            //margin-top -20px
+
+        &.poke-spells
+            &.poke-spells-hidden
+                //border-color cast(black 30%)
+                //border-bottom-width 1px
+                background cast(tan 20%)
+                margin-top -10px
+                h3
+                    letter-spacing .5px
+                    font-weight 300
+                    font-size 18px
+                    line-height 30px
+            h4 
+                font-size 16px
+                font-weight bold
+                margin-bottom 4px
+                display inline-block
+            p
+                font-size 13px
+                line-height 20px
+                font-weight 500
+
+    ul.poke-details-list
+        li
+            box(flex row nowrap, start center, 0 1)
+            padding 4px
+            span:nth-child(1)
+                font-weight bold
+            span:nth-child(2)
+                text-align right
+                border-bottom 1px dotted cast(black 60%)
+                //font-style italic
+
+    ul.poke-spells-list
+        li
+            //box(flex row nowrap, start center, 0 1)
+            padding 4px
+            span
+                font-weight bold
+                margin-bottom 12px
+                display block
+            ul
+                width 100%
+                padding 0 0 5px 5px
+                li
+                    border-bottom 1px dotted cast(black 60%)
+                    margin 4px 0 35px
+                    padding-left 8px
+                    border-radius 3px 3px 0 0
+                    box(flex row nowrap, start start, "1 0 180px" 1)
+                    & > h4 
+                        padding-right 14px
+                    &:last-child
+                        border-bottom 0
+                        margin-bottom 0
+                        padding-bottom 0
+                        p
+                            margin-bottom 0
+                
+
+    ul.poke-chain
+        box(flex row wrap, center end, 1)
+        h5
+            margin 0
+        .poke-chain-link
+            position relative
+            text-align center
+            a
+                display block
+            &.current
+                cursor default
+                pointer-events none
+                h5
+                    background #000
+                    color #fff
+                    border-radius 4px
+            h5
+                font-size 14px
+                letter-spacing -.25px
+                margin 0
+                padding 2px 10px
+                display inline-block
+            &:last-child
+                .arrow-chain-icon
+                    display none
+        .poke-chain-link-image
+            position relative
+            img
+                max-width 80px
+                max-height 60px
+            .arrow-chain-icon
+                position absolute
+                transform translate(50%, -50%)
+                top 50%
+                right 0
+                color cast(black 20%)
+
+
+svg#Layer_1
+    width 150%
+    height auto
+    max-height 600px
+    max-width 600px
+    position absolute
+    top 50%
+    left 50%
+    transform translate(-50%, -50%)
+    z-index -1
+
+    .st0, .st1, .st2, .st3
+        fill none
+        stroke cast(white 6%)
+        stroke-width 42
+        stroke-miterlimit 10
+
+    .st0 
+        stroke-dasharray 12.1947,12.1947,12.1947,12.1947,12.1947,12.1947
+
+    .st1
+        stroke-dasharray 50,90,200,30,40,0
+
+    .st2
+        stroke-linecap square
+        stroke-dasharray 120, 20, 110, 20, 140
+
+    .st3
+        stroke-width 16
+        stroke-linecap square
+
+@keyframes shine 
+    0%
+        transform translateX(-100%) translateY(-100%) rotate(30deg)
+    40%
+        transform translateX(-100%) translateY(-100%) rotate(30deg)
+    50%
+        transform translateX(100%) translateY(100%) rotate(30deg)
+
+//#pokemon.is-baby
+  //  .swap-button
+    //    background linear-gradient( 225deg, #d4e4fe, #fec4ee )
+      //  color #000
+        //&.activate svg
+          //  color #888
+
+//#pokemon.is-legendary
+  //  .swap-button
+    //    background linear-gradient( to bottom, #c39738, #deb761, #c39738 )
+
+//#pokemon.is-mythical
+  //  .swap-button
+    //    background linear-gradient( to bottom, #d5d7e5, #eee, #d5d7e5 )
+      //  color #000
+        //&.activate svg
+          //  color #888
+
+#pokemon.is-legendary,
+#pokemon.is-mythical
+    .poke-image .poke-image-placeholder .shine
+        display block
+        position absolute
+        height 100%
+        width 100%
+        z-index 1
+        overflow hidden
+        &:after
+            content ""
+            top 0
+            transform translateX(100%) rotate(30deg)
+            width 300%
+            height 300%
+            position absolute
+            z-index 1
+            animation shine 6s infinite ease-in
+            opacity .2
+            background linear-gradient( to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(128,186,232,0) 99%, rgba(128,186,232,0) 100%)

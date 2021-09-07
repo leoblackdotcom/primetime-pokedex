@@ -1,0 +1,42 @@
+{
+  "logo": "60px",
+  "header": {
+    "height": "70px"
+  },
+  "container": {
+    "page": "100%",
+    "header": "100%",
+    "body": "1400px"
+  },
+  "breakpoint": {
+    "wide": "1680px",
+    "normal": "1280px",
+    "narrow": "980px",
+    "narrower": "840px",
+    "mobile": "736px"
+  },
+  "layout": {
+    "unit": "px"
+  },
+  "gutter": {
+    "increment": "1rem"
+  },
+  "opacity": {
+    "dark": {
+      "default": "87%",
+      "disabled": "38%",
+      "divider": "12%",
+      "hint": "38%",
+      "inactive": "26%",
+      "secondary": "54%"
+    },
+    "light": {
+      "default": "100%",
+      "disabled": "50%",
+      "divider": "12%",
+      "hint": "50%",
+      "inactive": "30%",
+      "secondary": "70%"
+    }
+  }
+}

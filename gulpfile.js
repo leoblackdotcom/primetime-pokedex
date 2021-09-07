@@ -8,7 +8,7 @@ const concat = require('gulp-concat');
 const rename = require('gulp-rename');
 const uglify = require('gulp-uglify');
 
-var cssDest = './';
+var cssDest = './dist/css';
 
 gulp.task('stylus', function(){
 	return gulp.src('./src/styl/pokedex.styl')

@@ -1,0 +1,625 @@
+@require('_reset.styl')
+
+// import theme-as-keys
+json('../json/type.json')
+
+// import opts.settings.as.hash
+opts = json('../json/settings.json', { hash: true })
+
+// import colors
+//@require('colors.styl')
+
+// hash output
+_shout(hash)
+  for prop, val in hash
+    {prop}: val
+
+
+// ***************************************************************
+//
+// debug( $variable, $id )
+// 
+// variable:  < $object >
+// id:        < $num | $string >
+//
+// NOTE:  Attach ID to this warning message for easy reading of multiple debugs. If there is 
+//        no ID entered the function still creates a number ID based on how many times the 
+//        debug() function has been called.
+// ***************************************************************
+$debug = { "check": null }
+
+debug(input = false, id = false)
+  unless id
+    if $debug['check'] == null
+      $debug['check'] = 0
+    $debug['check'] = $debug['check'] + 1
+    id = $debug['check']
+  warn('***Debug ' + id + ': ' + input )
+
+
+// ***************************************************************
+//
+// box( $input, $align, $children )
+//
+// alias: flexbox()
+//
+// input:     < row | column | reverse | inline | wrap | wrap-reverse >
+// align:     < $justify-content $align-items $align-content >
+// children:  < 0 | 1 | $width | "$flex" >
+//
+// Ex: box(row nowrap, start center stretch)
+// Ex: box(row wrap, start start, "2 1 50%" "1 1 50%")
+// Ex: box(column nowrap, center center stretch, 50% 25% 300px 1 0)
+// Ex: box(children: 1 0 50% "0 0 100%")
+// ***************************************************************
+box(input = false, align = false, children = false)
+  hash = {}
+  // display
+  if input == false and align == false and children == false
+    hash['display'] = flex
+  else // if input is not empty ...
+    if 'flex' in input
+      if 'inline' in input
+        hash['display'] = inline-flex
+      else
+        hash['display'] = flex
+    // flex-direction
+    if 'column' in input or 'col' in input
+      if 'reverse' in input
+        hash['flex-direction'] = column-reverse
+      else
+        hash['flex-direction'] = column
+    else if 'row' in input
+      if 'reverse' in input
+        hash['flex-direction'] = row-reverse
+      else
+        hash['flex-direction'] = row
+    else if 'row-reverse' in input
+        hash['flex-direction'] = row-reverse
+    else if 'col-reverse' in input or 'column-reverse' in input
+        hash['flex-direction'] = column-reverse
+    // flex-wrap
+    if 'wrap-reverse' in input
+      hash['flex-wrap'] = wrap-reverse
+    else if 'nowrap' in input
+      hash['flex-wrap'] = nowrap
+    else if 'wrap' in input
+      hash['flex-wrap'] = wrap
+    // justify and align
+    if align != false
+      for item, i in align
+        if item == 'start'
+          item = flex-start
+        else if item == 'end'
+          item = flex-end
+        else if item == 'between'
+          item = space-between
+        else if item == 'around'
+          item = space-around
+        else if item == 'evenly' or item == 'even'
+          item = space-evenly
+        else if item == 'base'
+          item = baseline
+        else if item == 'middle'
+          item = center
+        if i == 0
+          hash['justify-content'] = item
+        if i == 1
+          hash['align-items'] = item
+        if i == 2
+          hash['align-content'] = item
+    // child
+    if children != false
+      alignily = length(children)
+      if alignily == 1
+        if type(children) == 'unit'
+          if unit(children) == ''
+            & > *
+              flex: children 1 auto
+          else
+            & > *
+              flex: 0 1 children
+        else if type(children) == 'string'
+          children = unquote(children)
+          flex: children
+      else
+        for item, i in children
+          i = i + 1
+          & > *:nth-child({alignily}n + {i})
+            if type(item) == 'string'
+              item = unquote(item)
+              flex: item
+            else if type(item) == 'unit' and unit(item) == ''
+              flex: item 1 auto
+            else
+              flex: 0 1 item
+  _shout hash
+
+flexbox(input = false, align = false, children = false)
+  box(input, align, children)
+
+
+// COLOR ASSIST
+cast(input = false, props = false)
+  inOpacity = false
+  inColor = false
+  inWeight = false
+  // process input ...
+  for item in input
+    // color
+    if type(item) == 'rgba'
+      inColor = item
+    else if type(item) == 'unit'
+      // opacity
+      if unit(item) == '%'
+        item = unit(item, '')
+        if item > 100
+          item = 100
+        else if item < 0
+          item = 0
+        inOpacity = item
+      else
+        // weight
+        if item > 1000
+          item = 1000
+        else if item < 0
+          item = 0
+        inWeight = item
+    else
+      warn("Unknown entry in cast():" + item)
+  unless inColor
+    error("Did not find a color in cast()")
+  // if darken/lighten weight is found ...
+  if inWeight
+    if inWeight > 500
+      inWeight = ((inWeight - 500) / 500) * 100
+      inWeight = unit(inWeight, '%')
+      inColor = darken(inColor, inWeight)
+    else if inWeight < 500
+      inWeight = ((inWeight - 500) / 500) * 100
+      inWeight = abs(inWeight)
+      inWeight = unit(inWeight, '%')
+      inColor = lighten(inColor, inWeight)
+  // if opacity is found ...
+  if inOpacity
+    inOpacity = inOpacity / 100
+    inColor = rgba(inColor, inOpacity)
+  // if properties are added ...
+  if current-property
+    inColor
+  else
+    if props
+      hash = {}
+      for prop in props
+        if prop == 'bg' or prop == 'bgcolor'
+          prop = 'background-color'
+        if prop == 'font' or prop == 'text'
+          prop = 'color'
+        hash[prop] = inColor
+      _shout hash
+    else 
+      color: inColor
+
+// POSITIONS
+_positioning(input = fill, zindex = false)
+  if input == 'fill'
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%;
+  else if input == 'all'
+    top: 0
+    left: 0
+    bottom: 0
+    right: 0
+  else if input == 'center'
+    top: 50%
+    left: 50%
+    transform translate(-50%, -50%)
+  else
+    for $item in input
+      if $item == 'top' or $item == 'bottom' or $item == 'left' or $item == 'right'
+        next = index(input, $item) + 1
+        next = input[next]
+        if next == 'auto' or type(next) == 'unit'
+          {$item}: next
+        else
+          {$item}: 0
+  if zindex
+    z-index: zindex
+// absolute
+absolute(input = fill, zindex = false)
+  position: absolute
+  _positioning(input, zindex)
+// relative
+relative(input = fill, zindex = false)
+  position: relative
+  _positioning(input, zindex)
+// fixed
+fixed(input = fill, zindex = false)
+  position: fixed
+  _positioning(input, zindex)
+
+
+// ***************************************************************
+//
+// icon( $icon, $font, $dblock, $svg )
+// 
+// icon:    < $size >
+// font:    < $size >
+// dblock:  < boolean >
+// svg:     < boolean >
+//
+// If $icon size is 48px that means width, height and line-height set to 48px
+// If $dblock is true then display block will be used instead of display inline-block
+// If $svg is true there will be added height value for SVG child element based on $font
+//
+// Ex: icon(48px, 24px)
+// Ex: icon(36px, 20px, true)
+// Ex: icon(36px, 20px, dblock: true)
+// ***************************************************************
+icon(iconSize = 48px, font = 24px, dblock = false, svg = false)
+  if dblock
+    display block
+  else
+    display inline-block
+  text-align center
+  width iconSize
+  height iconSize
+  line-height iconSize
+  unless svg
+    font-size font
+  if svg
+    position relative
+    svg
+      width: auto
+      height: 100%
+      max-height: font
+      absolute(center)
+
+
+// ***************************************************************
+//
+// +rig( $input )
+//
+// alias: +breakpoint()
+// 
+// input: < $width > < max | up | min | down | above | below >
+//
+// If get.breakpoint.mobile = 750px then the following will be true...
+//
+// Ex: +rig(mobile up)    => Greater than or equal to 750px
+// Ex: +rig(mobile min)   => Greater than or equal to 750px
+// Ex: +rig(mobile down)  => Lesser than or equal to 750px
+// Ex: +rig(mobile max)   => Lesser than or equal to 750px
+// Ex: +rig(mobile above) => Greater than 750px
+// Ex: +rig(mobile below) => Lesser than 750px
+// ***************************************************************
+_breakpoints = keys(opts.breakpoint)
+
+rig(input = 'mobile')
+  minmax = false
+  bp = false
+  for $item in input
+    if $item in _breakpoints
+      bp = opts.breakpoint[$item]
+    else if type($item) == 'unit'
+      bp = $item
+    else if $item == 'min' or $item == 'up' or $item == 'above'
+      minmax = 'min'
+    else if $item == 'max' or $item == 'down' or $item == 'below'
+      minmax = 'max'
+  unless bp
+    bp = opts.breakpoint.mobile
+  unless minmax
+    minmax = 'max'
+  if $item == 'above'
+    bp = bp + 1
+  else if $item == 'below'
+    bp = bp - 1
+  @media ({minmax}-width bp)
+    {block}
+
+breakpoint(input = 'mobile')
+  rig(input)
+
+
+// ***************************************************************
+//
+// gap( $margin )
+// pad( $padding )
+// 
+// margin/padding: Like normal margin/padding except it takes unitless numerical values and converts them to spacing increment.
+//
+// If (opts.gutter.increment = 1em) then the following will be true...
+//
+// Ex: gap(2)               => margin: 2em
+// Ex: gap(20px auto 5)     => margin: 20px auto 5em
+// Ex: pad(1 2 4 3)         => padding: 1em 2em 4em 3em
+//
+// If gap/pad is called inside of a property it will only return a value like so...
+// Ex: padding-left: pad(2) => padding-left: 2em
+// ***************************************************************
+_spacing(input = 1)
+  output = ()
+  if length(input) == 1 and type(input) == 'unit' and unit(input) == ''
+    output = input * opts.gutter.increment
+    return output
+  else
+    for $item in input
+      if type($item) == 'unit'
+        if unit($item) == ''
+          $item = $item * opts.gutter.increment
+        else if unit($item) == 'x'
+          $item = unit($item,'')
+          $item = $item * opts.gutter.increment
+      append(output, $item)
+    return output
+
+gap(input = 1)
+  if current-property
+    _spacing(input)
+  else
+    margin: _spacing(input)
+
+pad(input = 1)
+  if current-property
+    _spacing(input)
+  else
+    padding: _spacing(input)
+
+
+// ***************************************************************
+//
+// hug( $input, $pad )
+// 
+// input: < body | page | header | $width >
+// pad:   < $pad >
+//
+// Ex: hug(body)
+// Ex: hug(page)
+// Ex: hug(header, 15px)
+// Ex: hug(800px, 2)
+// ***************************************************************
+$container
+  display block
+  width 100%
+  margin-left auto
+  margin-right auto
+$page_container
+  @extend $container
+  max-width opts.container.page
+$header_container
+  @extend $container
+  max-width opts.container.header
+$body_container
+  @extend $container
+  max-width opts.container.body
++rig(mobile)
+  $body_container
+    padding-left pad(1)
+    padding-right pad(1)
+
+_containers = keys(opts.container)
+
+hug($input = 'body', $pad = false)
+  if $input in _containers
+    @extend ${$input}_container
+  else if type($input) == 'unit'
+    if unit($input) == ''
+      $input = unit($input, 'px')
+    @extend $container
+    max-width: $input
+  else
+    warn("Unknown input for hug(): " + $input)
+  if $pad
+    if type($pad) == 'unit'
+      if unit($pad) == ''
+        padding-left pad($pad)
+        padding-right pad($pad)
+      else
+        padding-left $pad
+        padding-right $pad
+
+
+// ***************************************************************
+//
+// its( $input, $units )
+// 
+// input: < $width | $num >
+// units: < $unit >
+//
+// Convertable Units: px, pt, pc, mm, cm, in, em, rem
+//
+// Ex: its(1400px)    => converts 1400px to default units
+// Ex: its(400)       => converts 400px to default units
+// Ex: its(3in, em)   => converts 3 inches to em equivalent
+// Ex: its(1000, cm)  => converts 1000px to centimeter equivalent
+// ***************************************************************
+$remBase = unit(font-size-html, '')
+$remUnit = unit(font-size-html)
+
+_unitConversions = {'px': 96, 'pt': 72, 'pc': 6, 'mm': 25.4, 'cm': 2.54, 'in': 1, 'em': null, 'rem': null}
+_convertableUnits = keys(_unitConversions)
+
+if unit(font-size-html) in _convertableUnits
+  $remConversion = _unitConversions[$remUnit] / $remBase
+else
+  warn("Not a proper unit for font size (settings.json): " + unit(font-size-html))
+
+_unitConversions[rem] = $remConversion
+_unitConversions[em] = _unitConversions[rem]
+
+its(input = false, outgoingUnits = opts.layout.unit)
+  incomingUnits = false
+  // set incoming units and size
+  if type(input) == 'unit'
+    if unit(input) == ''
+      incomingUnits = 'px'
+    else
+      incomingUnits = unit(input)
+      input = unit(input, '') // strip
+  else
+    warn("its() requires a numerical width input: " + input)
+  // convert incoming value to inches
+  incomingConversionRate = _unitConversions[incomingUnits]
+  input = input / incomingConversionRate
+  // convert outgoing value FROM inches
+  outgoingConversionRate = _unitConversions[outgoingUnits]
+  input = input * outgoingConversionRate
+  // add outgoing units to calculated value
+  input = unit(input, outgoingUnits)
+  return input
+
+
+// truncate text with ellipsis
+cut()
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+truncate()
+  cut()
+
+
+// theme classes
+$padProperties =  'margin', 'padding'
+$padPositions =   'top', 'bottom', 'left', 'right'
+$bodyType =       'html', 'body', 'menu', 'button', 'caption'
+$containerType =  'page', 'header', 'body'
+
+theme(input = false)
+  if input == all
+    input = 'reset', 'body', 'heading', 'wrap', 'space'
+  for $item in input
+
+    // reset
+    if $item == reset
+      @require('_reset.styl')
+
+    // body
+    if $item == body or $item == content
+      for $element in $bodyType
+        $sizeValue =      lookup('font-size-' + $element)
+        $weightValue =    lookup('font-weight-' + $element)
+        $leadingValue =   lookup('font-line-height-' + $element)
+        $kerningValue =   lookup('font-letter-spacing-' + $element)
+        $familyValue =    lookup('font-stack-' + $element)
+        $transformValue = lookup('font-transform-button')
+        if $element == html
+          html
+            font-size $sizeValue
+        else
+          if $element == caption
+            $outElement = '.caption'
+          else if $element == menu
+            $outElement = 'nav, nav a:not(.btn):not(.button)'
+          else if $element == button
+            $outElement = '.btn, a.btn, .button, a.button, button, input[type="submit"], input[type="button"], input[type="reset"]'
+          else
+            $outElement = $element
+          {$outElement}
+            if $element == body or $element == button
+              font-family: lookup('font-stack-' + $element)
+            font-size its($sizeValue)
+            font-weight $weightValue
+            line-height $leadingValue
+            if $kerningValue != 0
+              letter-spacing $kerningValue
+            if $element == button
+              if $transformValue != 'none'
+                text-transform $transformValue
+              margin-bottom: font-margin-bottom-button
+        if $element == body
+          p
+            margin-bottom font-margin-bottom-body
+      a
+        text-decoration none
+
+    // heading: h1..6
+    if $item == headings or $item == heading or $item == title
+      h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6
+        font-family: font-stack-heading
+      for $num in (1..6)
+        $heading = 'h' + $num
+        $sizeValue =    lookup('font-size-' + $heading)
+        $weightValue =  lookup('font-weight-' + $heading)
+        if $weightValue == 'thin'
+          $weightValue = 100
+        else if $weightValue == extra-light
+          $weightValue = 200
+        else if $weightValue == ultra-light
+          $weightValue = 200
+        else if $weightValue == light
+          $weightValue = 300
+        else if $weightValue == normal
+          $weightValue = 400
+        else if $weightValue == book
+          $weightValue = 400
+        else if $weightValue == medium
+          $weightValue = 500
+        else if $weightValue == semi-bold or $weightValue == demi-bold or $weightValue == demi or $weightValue == semi
+          $weightValue = 600
+        else if $weightValue == bold
+          $weightValue = 700
+        else if $weightValue == ultra-bold or $weightValue == extra-bold
+          $weightValue = 800
+        else if $weightValue == black or $weightValue == heavy
+          $weightValue = 900
+        $leadingValue =       lookup('font-line-height-' + $heading)
+        $kerningValue =       lookup('font-letter-spacing-' + $heading)
+        $transformValue =     lookup('font-transform-' + $heading)
+        $marginBottomValue =  lookup('font-margin-bottom-' + $heading)
+        $heading = $heading + ', .' + $heading
+        {$heading}
+          font-size its($sizeValue)
+          font-weight $weightValue
+          line-height $leadingValue
+          if $kerningValue != 0
+            letter-spacing $kerningValue
+          if $transformValue != 'none'
+            text-transform $transformValue
+          margin-bottom: $marginBottomValue
+
+    // spacing: margin, padding
+    if $item == space or $item == spacing
+      for $num in (0..10)
+        for $prop in $padProperties
+          for $subProp in $padPositions
+            $fullProp = $prop + '-' + $subProp
+            if $prop == 'margin'
+              $shortProp = 'm'
+            else if $prop == 'padding'
+              $shortProp = 'p'
+            if $subProp == 'top'
+              $shortSubProp = 't'
+            else if $subProp == 'bottom'
+              $shortSubProp = 'b'
+            else if $subProp == 'left'
+              $shortSubProp = 'l'
+            else if $subProp == 'right'
+              $shortSubProp = 'r'
+            $short = $shortProp + $shortSubProp + '-' + $num
+            $propVal = unquote($fullProp + '-' + $num)
+            $property = '.' + $propVal + ', .' + $short
+            {$property}
+              if $num == 0
+                {$fullProp}: 0 !important
+              else
+                {$fullProp}: pad($num)
+
+    // containers
+    if $item == container or $item == containers or $item == wrap
+      for $wrap in $containerType
+        if $wrap == page
+          .page-container
+            hug(page)
+        else if $wrap == header
+          #header
+            .container
+              hug(header, 1)
+        else if $wrap == body
+          .container
+            hug()
+
+theme(all)
