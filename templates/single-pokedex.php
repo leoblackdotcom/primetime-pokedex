@@ -45,19 +45,19 @@ $hatch_time =       	hokepoke('pokemon_hatch_time');
 // Incoming as comma-seperated list...
 $abilities = 			hokepoke('pokemon_abilities'); 
 $abilities_hidden = 	hokepoke('pokemon_abilities_hidden');
-$evolutions = 			hokepoke('pokemon_evolution');
-$evolution_classes =	hokepoke('pokemon_evolution_class');
-$evolution_images = 	hokepoke('pokemon_evolution_image');
-$evolution_ids = 	    hokepoke('pokemon_evolution_id');
+$evolutions = 			hokepoke('pokemon_evolution_chain');
+//$evolution_classes =	hokepoke('pokemon_evolution_class');
+//$evolution_images = 	hokepoke('pokemon_evolution_image');
+//$evolution_ids = 	    hokepoke('pokemon_evolution_id');
 $types = 				hokepoke('pokemon_type');
 $weaknesses = 			hokepoke('pokemon_weakness');
 // ...convert lists to arrays...
 $abilities =	 		explode(",", $abilities);
 $abilities_hidden = 	explode(",", $abilities_hidden);
-$chain = 				explode(",", $evolutions);
-$chain_classes = 		explode(",", $evolution_classes);
-$chain_images =	 		explode(",", $evolution_images);
-$chain_ids =	 		explode(",", $evolution_ids);
+//$chain = 				explode(",", $evolutions);
+//$chain_classes = 		explode(",", $evolution_classes);
+//$chain_images =	 		explode(",", $evolution_images);
+//$chain_ids =	 		explode(",", $evolution_ids);
 $types = 				explode(",", $types);
 $weaknesses = 			explode(",", $weaknesses);
 
@@ -162,53 +162,38 @@ function pokespells($spells, $hidden = false) {
 
 // POKECHAIN
 // Create evolution chain block
-function pokechain($chain, $chain_classes, $chain_images, $chain_ids, $current_id) {
-	$chainLength = count($chain);
+/*function pokechain(array $array) {
 	echo '<ul class="poke-chain flex-list clean-list">';
-		for($i = 0; $i < $chainLength; $i++) {
-			echo '<li class="poke-chain-link';
-        if($chain_ids[$i] == $current_id ) {
-          echo ' current';
-        }
-        echo '">';
-			echo '<a href="../' . $chain_classes[$i] . '">';
-				echo '<div class="poke-chain-link-image"><img src="' . $chain_images[$i] . '" /><i class="fas fa-chevron-double-right arrow-chain-icon"></i></div>';
-				echo '<h5>' . $chain[$i] . '</h5>';
-			echo '</a>';
-		echo '</li>';
-		}
-	echo '</ul>';
-}
+
+	foreach($array as $item) {
+
+	}
+
+	echo '</ul>'
+}*/
 
 // Set number for random button
 $pokeRand = rand(1,898);
 
 ?>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Karantina:wght@300;400;700&display=swap" rel="stylesheet">
+
 <a name="Pokedex"></a>
 <section id="pokedex">
-	<div class="centered">
-		<a href="../<?php echo $pokeRand ?>#Pokedex" class="button btn-small no-margin " rel="nofollow"><i class="fas fa-dice-three"></i>&nbsp; Random Pokémon</a>
-	</div>
-	<nav id="pokenav">
+<nav id="pokenav">
 		<div class="pokenav-link pokenev-left">
-			<a class="poke-nav-left" href="../<?php echo $prev_class; ?>" title="<?php echo $prev; ?>">
+			<a class="poke-nav-left" href="<?php echo site_url() . '/pokedex/' . $prev_class; ?>" title="<?php echo $prev; ?>">
 				<i class="fal fa-long-arrow-left arrow-button"></i>
 				<span class="poke-nav-thumb" style="background-image: url('<?php echo $prev_image; ?>');"></span>
-				<!--span class="poke-nav-name"><sup>#</sup><?php echo $prev_id; ?></span-->
 			</a>
 		</div>
 		<div class="poke-current">
 			<span class="poke-name"><sup>#</sup><?php echo $current_id; ?> <b><?php echo $current_name; ?></b></span>
 		</div>
 		<div class="pokenav-link pokenav-right">
-			<a class="poke-nav-right" href="../<?php echo $next_class; ?>" title="<?php echo $next; ?>">
+			<a class="poke-nav-right" href="<?php echo site_url() . '/pokedex/' . $next_class; ?>">
 				<i class="fal fa-long-arrow-right arrow-button"></i>
 				<span class="poke-nav-thumb" style="background-image: url('<?php echo $next_image; ?>');"></span>
-				<!--span class="poke-nav-name"><sup>#</sup><?php echo $next_id; ?></span-->
 			</a>
 		</div>
 	</nav>
@@ -272,10 +257,14 @@ $pokeRand = rand(1,898);
 						<?php pokestats($stat_hp, $stat_attack, $stat_defense, $stat_sattack, $stat_sdefense, $stat_speed); ?>
 					</div>
 				</div>
-				<div class="poke-card poke-chain">
+				<!--php if(count($evolutions) > 1) : -->
+				<br/><br/>
+				<div class="poke-card poke-card-clean poke-chain">
+					<?php print_r($evolutions); ?>
 					<h3>Evolutions</h3>
-					<?php pokechain($chain, $chain_classes, $chain_images, $chain_ids, $current_id); ?>
+					
 				</div>
+				<!--php endif; -->
 			</div>
 			<div class="poke-summary">
 				<div class="poke-card poke-card-clean poke-description">
@@ -341,6 +330,10 @@ $pokeRand = rand(1,898);
 			</div>
 		</div>
 	</article>
+
+	<div class="centered">
+		<a href="../<?php echo $pokeRand ?>#Pokedex" class="button no-margin " rel="nofollow"><i class="fas fa-dice-three"></i>&nbsp; I'm feeling lucky!</a>
+	</div>
 
 </section>
 

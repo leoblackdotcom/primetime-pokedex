@@ -14,10 +14,12 @@ class PrimetimePokedex {
     }
     public function hooks() {
         add_action('init', 'add_pokedex_post_tax');
-        add_action('admin_enqueue_scripts', 'pokedex_custom_js');
+        add_action('wp_enqueue_scripts', 'pokedex_custom_js', 999);
         add_action('wp_enqueue_scripts', 'pokedex_awesome_icons');
-        add_action('wp_head', 'pokedex_custom');
+        add_action('wp_enqueue_scripts', 'pokedex_custom', 100);
         add_filter( 'single_template', 'set_pokedex_single_template' );
+        add_filter( 'archive_template', 'set_pokedex_archive_template' );
+        add_filter( 'search_template', 'set_pokedex_search_template' );
     }
 }
 $var = new PrimetimePokedex($pokemonCount);
@@ -96,7 +98,9 @@ function page_builder_page($count) {
         <h2>Pok&eacute;dex Page Builder</h2>
         <form id="sendform" action="edit.php?post_type=pokedex&page=page-builder" method="post">
             <input type="hidden" value="true" name="builder_button" /><br/><br/>
+            <!--label style='display: inline-block; width: 200px;'><b>From Page:</b></label> &nbsp;<input class='bpid' type='number' value='265' max='<?php echo $count; ?>' min='1' name='builder_page_id' /><br/><br/-->
             <label style='display: inline-block; width: 200px;'><b>From Page:</b></label> &nbsp;<input class='bpid' type='number' value='1' max='<?php echo $count; ?>' min='1' name='builder_page_id' /><br/><br/>
+            <!--label style='display: inline-block; width: 200px;'><b>To Page:</b></label> &nbsp;<input class='bpid' type='number' value='265' max='<?php echo $count; ?>' min='1' name='builder_page_count' /><br/><br/-->
             <label style='display: inline-block; width: 200px;'><b>To Page:</b></label> &nbsp;<input class='bpid' type='number' value='<?php echo $count; ?>' max='<?php echo $count; ?>' min='1' name='builder_page_count' /><br/><br/>
             <small><i><b>Note</b>: Building more than ~200 pages at a time will cause a timeout and you will need to do this again starting from whatever page it timed out on.</i></small><br/><br/>
             <?php submit_button('Build/Update Pages', 'primary', 'submit', false); ?>
@@ -113,23 +117,45 @@ function set_pokedex_single_template( $single_template ) {
     if ( 'pokedex' === $post->post_type ) { $single_template = dirname( __FILE__ ) . '/templates/single-pokedex.php'; }
     return $single_template;
 }
+function set_pokedex_archive_template( $archive_template ) {
+    global $post;
+    if ( is_archive() && 'pokedex' === $post->post_type ) { $archive_template = dirname( __FILE__ ) . '/templates/archive-pokedex.php'; }
+    return $archive_template;
+}
+function set_pokedex_search_template( $search_template ) {
+    global $wp_query;
+    if ( $wp_query->is_search ) { $search_template = dirname( __FILE__ ) . '/templates/archive-pokedex.php'; }
+    return $search_template;
+}
+function changeSearchSort( $orderby, $query ){
+    global $wpdb;
+
+    if(!is_admin()) {
+        if(is_search() || is_archive()) {
+            $orderby =  $wpdb->prefix."posts.post_title ASC";
+        }
+    }
+    return  $orderby;
+}
+add_filter('posts_orderby','changeSearchSort',10,2);
+
 
 // ENQUEUE
 // Add custom scripts and styles to pokedex pages
 function pokedex_custom_js() { 
-    wp_enqueue_script( 'pokedex_scripts', plugin_dir_url( __FILE__ ) . 'dist/js/primetime-pokedex.js', array('jquery'), '1.0' );
+    wp_enqueue_script( 'pokedex_scripts', plugin_dir_url( __FILE__ ) . 'dist/js/primetime-pokedex.js', array('jquery'), '1.0', true );
 }
 function pokedex_custom(){
-    if( is_singular('pokedex') ){
+    /*if( is_singular('pokedex') ){*/
         wp_enqueue_style('pokedex_custom_css', plugins_url("/dist/css/pokedex.css", __FILE__));
-    }
+    /*}*/
 }
 function pokedex_awesome_icons(){
-    if( is_singular('pokedex') ){
-        wp_enqueue_script('pokedex_icons', 'https://kit.fontawesome.com/4302ca1eeb.js');
-        wp_enqueue_script('pokedex_custom_js', plugins_url('/primetime-pokedex/dist/js/primetime-pokedex.js'), array('jquery'), null, true);
-    }
+    wp_enqueue_script('pokedex_icons', 'https://kit.fontawesome.com/4302ca1eeb.js');
 }
+
+// REMOVE ELEMENTS
+//remove_action('woocommerce_before_main_content', 'woocommerce_breadcrumb', 20, 0);
 
 // UTILITY
 // Convert inches to feet and inches (0'0")
@@ -142,6 +168,22 @@ function in_feet($in) {
 function add_digits($input, $length) {
     $input = substr(str_repeat(0, $length).$input, - $length);
     return $input;
+}
+// Get depth of an array
+function array_depth($arr) {    
+    if (!is_array($arr)) { return 0; }
+    $arr = json_encode($arr);
+    $varsum = 0; 
+    $depth  = 0;
+    for ($i=0;$i<strlen($arr);$i++) {
+        $varsum += intval($arr[$i] == '[') - intval($arr[$i] == ']');
+        if ($varsum > $depth) { $depth = $varsum; }
+    }
+    return $depth;
+}
+// Debug array
+function dbug($incoming, string $string = "Dbug") {
+    echo "<b>$string:</b><br/><pre>"; print_r($incoming); echo "</pre><br/><br/>";
 }
 
 // GET_POKEDATA
@@ -185,51 +227,81 @@ function get_pokecount() {
     }
 }
 
+// BUILD_TITLE
+// Combine ID and name into a title also used for classes/anchors
+function build_title(array $array) {
+    $name = $array['species']['name'];
+    $species = $array['species']['url'];
+    $species = get_pokedata($species,'',true);
+    $id = $species['id'];
+    $title = ucwords("#$id $name");
+    return $title;
+}
+
+// GET_IMAGE_URL
+// Get the URL of the main image for this pokemon
+function get_image_url(array $array, $dreamWorld = true) {
+    $species = $array['species']['url'];
+    $species = get_pokedata($species,'',true);
+    $id = $species['id'];
+    $pokemon = get_pokedata($id);
+    $sprites = $pokemon['sprites'];
+    $dream = $sprites['other']['dream_world']['front_default'];
+    $default = $sprites['other']['official-artwork']['front_default'];
+    if(!empty($dream) && $dreamWorld == true) { $image = $dream; } 
+    else { $image = $default; }
+    return $image;
+}
+
+// POKE_SINGLE
+// Get title and image URL of this pokemon
+function poke_single(array $array) {
+    $title = build_title($array);
+    $imageURL = get_image_url($array);
+    return [$title, $imageURL];
+}
+
+// POKE_CHAIN
+// Create array/list of pokemon in this evolution chain
+function poke_chain($array, $build = array(), $depth = 0) {
+    $length = count($array);
+    for($i = 0; $i < $length; $i++) {
+        $current = poke_single($array[$i]);
+        if(empty($build[$depth])) { $build[$depth] = array(); }
+        array_push($build[$depth], $current);
+        if(empty($array[$i]['evolves_to'])) { 
+            continue;
+        } else {
+            $depth++;
+            $build = poke_chain($array[$i]['evolves_to'], $build, $depth);
+        }
+    }
+    return $build;
+}
+
 // ADD_POKEMON
 // Add a page/pokemon to pokedex
-function add_pokemon($id, $tax = 'pokedex', $count ) {
-    $pokeCount = $count;
-    $length = 3; // Bulbasaur #3 -> Bulbasaur #003
+function add_pokemon($id, $tax = 'pokedex', $pokeCount ) {
+    $length = strlen((string) abs($pokeCount));
+    $dreamWorld = true;
+    // Pokémon Details
     $id = $id;
     $pokeID = $id;
-    $pokeNextID = $pokeID + 1;
-    $pokePrevID = $pokeID - 1;
-    if($pokeNextID > $pokeCount) { $pokeNextID = 1; }
-    if($pokePrevID < 1) { $pokePrevID = $pokeCount; }
-    $dreamWorld = true;
+    $poke = get_pokedata($pokeID);
+    // Name
+    $pokeName = ucwords($poke['species']['name']);
+    $pokeImage = $poke['sprites']['other']['dream_world']['front_default'];
+    $pokeImageDefault = $poke['sprites']['other']['official-artwork']['front_default'];
+    // Image
+    if(empty($pokeImage) || !$dreamWorld ) { $pokeImage = $pokeImageDefault; }
+    // Stats
+    $pokeStats = $poke['stats'];
+    // Type
+    $pokeType = $poke['types'];    
+    // Build type/weak/strengths lists
     $pokeTypeList = array();
     $pokeWeakList = array();
     $pokeStrongList = array();
-    $pokeSpellsList = array();
-    $pokeSpellsNameList = array();
-    $pokeHiddenSpellsList = array();
-    $pokeHiddenSpellsNameList = array();
-    $pokeEvolList = array();
-    $pokeEvolClassList = array();
-    $pokeEvolImageList = array();
-    $pokeEvolIDList = array();
-    $pokeDescList = array();
-    $hasEvolution = false;
-    $poke = get_pokedata($pokeID); //// pull pokemon details
-    $pokeName = ucwords($poke['species']['name']); // name
-    $pokeImage = $poke['sprites']['other']['dream_world']['front_default']; // image
-    if(empty($pokeImage) || !$dreamWorld ) { $pokeImage = $poke['sprites']['other']['official-artwork']['front_default']; }
-    $pokeStats = $poke['stats']; // stats
-    $pokeType = $poke['types']; // type
-    $pokeNextTitle = '';
-    $pokeNextImage = '';
-    $pokeNextClass = '';
-    $pokePrevTitle = '';
-    $pokePrevImage = '';
-    $pokePrevClass = '';
-    $pokeHabitat = '';
-    $pokeGrowthRate = '';
-    $pokeBaby = '';
-    $pokeLegendary = '';
-    $pokeMythical = '';
-    $pokeNameAlt = '';
-    $pokeStop = false;
-    // Build lists
     foreach ($pokeType as $option) {
         // Types
         $typeName = $option['type']['name'];
@@ -278,6 +350,10 @@ function add_pokemon($id, $tax = 'pokedex', $count ) {
     $pokeWeight = round($pokeWeight, 1);
     $pokeWeight = $pokeWeight . " lbs.";
     // Abilities
+    $pokeSpellsList = array();
+    $pokeSpellsNameList = array();
+    $pokeHiddenSpellsList = array();
+    $pokeHiddenSpellsNameList = array();
     $pokeSpells = $poke['abilities'];
     foreach($pokeSpells as $option) {
         $spellName = $option['ability']['name'];
@@ -305,6 +381,8 @@ function add_pokemon($id, $tax = 'pokedex', $count ) {
     // Pokémon Species
     $pokeSpec = get_pokedata($pokeID, 'pokemon-species');
     // Description
+    $pokeStop = false;
+    $pokeDescList = array();
     $pokeDesc = $pokeSpec['flavor_text_entries'];
     $pokeDesc = array_reverse($pokeDesc);
     foreach($pokeDesc as $flavor) {
@@ -319,25 +397,31 @@ function add_pokemon($id, $tax = 'pokedex', $count ) {
         }
     }
     // Habitat
+    $pokeHabitat = '';
     if(!empty($pokeSpec['habitat'])) {
         $pokeHabitat = $pokeSpec['habitat']['name'];
-        $pokeHabitatURL = $pokeSpec['habitat']['url'];
+        //$pokeHabitatURL = $pokeSpec['habitat']['url'];
         $pokeHabitat = ucwords($pokeHabitat);
     }
     // Growth rate
+    $pokeGrowthRate = '';
     $pokeGrowthRate = $pokeSpec['growth_rate']['name'];
     $pokeGrowthRate = ucwords($pokeGrowthRate);
-    $pokeGrowthRateURL = $pokeSpec['growth_rate']['url'];
+    //$pokeGrowthRateURL = $pokeSpec['growth_rate']['url'];
     // Alt names
+    $pokeNameAlt = '';
     $pokeNames = $pokeSpec['names'];
     foreach($pokeNames as $name) {
         if($name['language']['name'] == 'ja') { $pokeNameAlt = $name['name']; }
     }
     // Baby check
+    $pokeBaby = '';
     $pokeBaby =  $pokeSpec['is_baby'];
     // Legendary check
+    $pokeLegendary = '';
     $pokeLegendary =  $pokeSpec['is_legendary'];
     // Mythical check
+    $pokeMythical = '';
     $pokeMythical =  $pokeSpec['is_mythical'];
     // Gender
     $pokeGender = $pokeSpec['gender_rate'];
@@ -350,77 +434,51 @@ function add_pokemon($id, $tax = 'pokedex', $count ) {
     $pokeHatch = $pokeSpec['hatch_counter'];
     // Navigation
     // Next
+    $pokeNextID = $pokeID + 1;
+    $pokePrevID = $pokeID - 1;
+    if($pokeNextID > $pokeCount) { $pokeNextID = 1; }
+    if($pokePrevID < 1) { $pokePrevID = $pokeCount; }
     $pokeNext = get_pokedata($pokeNextID);
-    $pokeNextName =  $pokeNext['name'];
+    $pokeNextName =  $pokeNext['species']['name'];
     $pokeNextImage = $pokeNext['sprites']['other']['dream_world']['front_default'];
     if(!$pokeNextImage || !$dreamWorld ) { $pokeNextImage = $pokeNext['sprites']['other']['official-artwork']['front_default']; }
-    $pokeNextTitle = ucwords("#$pokeNextID $pokeNextName"); // combine ids and names for titles
+    $pokeNextTitle = ucwords("$pokeNextID $pokeNextName"); // combine ids and names for titles
     $pokeNextClass = sanitize_title($pokeNextTitle);
     // Previous
     $pokePrev = get_pokedata($pokePrevID);
-    $pokePrevName =  $pokePrev['name'];
+    $pokePrevName =  $pokePrev['species']['name'];
     $pokePrevImage = $pokePrev['sprites']['other']['dream_world']['front_default'];
     if(!$pokePrevImage || !$dreamWorld ) { $pokePrevImage = $pokePrev['sprites']['other']['official-artwork']['front_default']; }
-    $pokePrevTitle = ucwords("#$pokePrevID $pokePrevName");
+    $pokePrevTitle = ucwords("$pokePrevID $pokePrevName");
     $pokePrevClass = sanitize_title($pokePrevTitle);
+
     // Evolution Chain
-    $pokeEvolChainURL = $pokeSpec['evolution_chain']['url'];
-    $pokeEvolChain = get_pokedata($pokeEvolChainURL,'',true);
-    $pokeEvolChain = $pokeEvolChain['chain'];
-    $pokeEvolSpeciesURL = $pokeEvolChain['species']['url'];
-    $pokeEvolSpecies = get_pokedata($pokeEvolSpeciesURL,'',true);
-    $pokeEvolSpeciesID = $pokeEvolSpecies['id'];
-    $pokeEvol = get_pokedata($pokeEvolSpeciesID);
-    $pokeEvolName = $pokeEvol['species']['name'];
-    $pokeEvolTitle = ucwords("#$pokeEvolSpeciesID $pokeEvolName");
-    $pokeEvolClass = sanitize_title($pokeEvolTitle);
-    $pokeEvolSprites = $pokeEvol['sprites'];
-    if(!empty($pokeEvolSprites['other']['dream_world']['front_default']) && $dreamWorld == true) {
-        $pokeEvolImage = $pokeEvolSprites['other']['dream_world']['front_default'];
-    } else { 
-        $pokeEvolImage = $pokeEvolSprites['other']['official-artwork']['front_default']; 
-    }
-    array_push($pokeEvolIDList, $pokeEvolSpeciesID);
-    array_push($pokeEvolImageList, $pokeEvolImage);
-    array_push($pokeEvolList, $pokeEvolTitle);
-    array_push($pokeEvolClassList, $pokeEvolClass);
-    $pokeEvolChain = $pokeEvolChain['evolves_to'];
-    if(!empty($pokeEvolChain)) { $hasEvolution = true; }
-    while($hasEvolution == true) {
-        $pokeEvolChain = $pokeEvolChain[0];
-        $pokeEvolSpeciesURL = $pokeEvolChain['species']['url'];
-        $pokeEvolSpecies = get_pokedata($pokeEvolSpeciesURL,'',true);
-        $pokeEvolSpeciesID = $pokeEvolSpecies['id'];
-        $pokeEvol = get_pokedata($pokeEvolSpeciesID);
-        $pokeEvolName = $pokeEvol['species']['name'];
-        $pokeEvolTitle = ucwords("#$pokeEvolSpeciesID $pokeEvolName");
-        $pokeEvolClass = sanitize_title($pokeEvolTitle);
-        $pokeEvolSprites = $pokeEvol['sprites'];
-        if(!empty($pokeEvolSprites['other']['dream_world']['front_default']) && $dreamWorld == true) {
-            $pokeEvolImage = $pokeEvolSprites['other']['dream_world']['front_default'];
-        } else { 
-            $pokeEvolImage = $pokeEvolSprites['other']['official-artwork']['front_default']; 
-        }
-        array_push($pokeEvolIDList, $pokeEvolSpeciesID);
-        array_push($pokeEvolImageList, $pokeEvolImage);
-        array_push($pokeEvolList, $pokeEvolTitle);
-        array_push($pokeEvolClassList, $pokeEvolClass);
-        $pokeEvolChain = $pokeEvolChain['evolves_to'];
-        if(empty($pokeEvolChain)) { $hasEvolution = false; }
-    }
+    $pokeChainURL = $pokeSpec['evolution_chain']['url'];
+    $pokeColor = $pokeSpec['color']['name'];
+    $pokeChain = get_pokedata($pokeChainURL,'',true);
+    $pokeEvolutions = array();
+    $pokeEvolutions[0] = $pokeChain['chain'];
+    $pokeEvol = poke_chain($pokeEvolutions);
     // Create post/page
     $pokeLongID = add_digits($pokeID, $length);
     $postTitle = "#$pokeLongID $pokeName";
     $postTitleClass = "#$pokeID $pokeName";
     $postTitleClass = sanitize_title($postTitleClass);
+    if(empty($pokeDescList['default'])) {
+        $pokeContent = $pokeDescList['sword'];
+    } else {
+        $pokeContent = $pokeDescList['default'];
+    }
+    
     $array = array(
         'post_title'    => "$postTitle",
         'post_type'     => "$tax",
-        'post_status'   => 'publish',
+        'post_status'   => "publish",
         'post_name'     => "$postTitleClass",
         'post_author'   => 1,
         'comment_status'=> 'closed',
-        'ping_status'   => 'closed'
+        'ping_status'   => 'closed',
+        'post_content'  => $pokeContent
     );
     // Check if post already exists and update by adding ID to array
     if( post_exists("$postTitle", '', '', "$tax") ) {
@@ -435,16 +493,25 @@ function add_pokemon($id, $tax = 'pokedex', $count ) {
         $array = array_reverse($array);
         $array['ID'] = $found[0];
         $array = array_reverse($array);
-        echo "<b>Page found</b>....";
+        echo "<b>Page #$pokeID found</b>....";
         $post_id = wp_update_post( $array );
-        $outMsg = "Page #$pokeID updated successfully.<br/>";
+        $outMsg = "updated successfully.<br/>";
     } else {
         $post_id = wp_insert_post( $array );
         $outMsg = "Page #$pokeID created successfully.<br/>";
     }
+
+    $featImgURL = "$pokeImageDefault";
+    //dbug($featImgURL,"feat img");
+    $featImgDesc    = "Profile image for $pokeName";
+    $featImage = media_sideload_image( $featImgURL, $post_id, $featImgDesc, 'id' );
+    //dbug($featImage,"feat img");
+    set_post_thumbnail( $post_id, $featImage );
+
     // Metadata
     pokepush($post_id, 'pokemon_id', $pokeID);
     pokepush($post_id, 'pokemon_name', $pokeName);
+    pokepush($post_id, 'pokemon_color', $pokeColor);
     pokepush($post_id, 'pokemon_image', $pokeImage);
     pokepush($post_id, 'pokemon_height', $pokeHeight);
     pokepush($post_id, 'pokemon_weight', $pokeWeight);
@@ -472,18 +539,10 @@ function add_pokemon($id, $tax = 'pokedex', $count ) {
         $metaFieldName = 'pokemon_ability_hidden_' . $spell;
         pokepush($post_id, $metaFieldName, $desc);
     }
-    $pokeEvolString = implode(",", $pokeEvolList);
-    pokepush($post_id, 'pokemon_evolution', $pokeEvolString);
-    $pokeEvolClassString = implode(",", $pokeEvolClassList);
-    pokepush($post_id, 'pokemon_evolution_class', $pokeEvolClassString);
-    $pokeEvolImageString = implode(",", $pokeEvolImageList);
-    pokepush($post_id, 'pokemon_evolution_image', $pokeEvolImageString);
-    $pokeEvolIDString = implode(",", $pokeEvolIDList);
-    pokepush($post_id, 'pokemon_evolution_id', $pokeEvolIDString);
-    pokepush($post_id, 'pokemon_next', $pokeNextTitle);
+    //pokepush($post_id, 'pokemon_next', $pokeNextTitle);
     pokepush($post_id, 'pokemon_next_image', $pokeNextImage);
     pokepush($post_id, 'pokemon_next_class', $pokeNextClass);
-    pokepush($post_id, 'pokemon_prev', $pokePrevTitle);
+    //pokepush($post_id, 'pokemon_prev', $pokePrevTitle);
     pokepush($post_id, 'pokemon_prev_image', $pokePrevImage);
     pokepush($post_id, 'pokemon_prev_class', $pokePrevClass);
     pokepush($post_id, 'pokemon_habitat', $pokeHabitat);
@@ -497,6 +556,9 @@ function add_pokemon($id, $tax = 'pokedex', $count ) {
         pokepush($post_id, $metaFieldName, $desc);
     }
     pokepush($post_id, 'pokemon_hatch_time', $pokeHatch);
+    //dbug($pokeEvol, "Evolutions");
+    //pokepush($post_id, 'pokemon_evolution_chain', $pokeEvol);
+    update_post_meta( $post_id, 'pokemon_evolution_chain', $pokeEvol );
     // Notification
     echo $outMsg;
 }
@@ -507,7 +569,7 @@ function add_pokemon($id, $tax = 'pokedex', $count ) {
 function pokepush($post_id, $meta, $pokeData) {
     $pokeData = $pokeData;
     $meta = $meta;
-    if(!empty($pokeData)) {
+    if(!empty($pokeData) || is_array($pokeData)) {
         if(metadata_exists( 'post', $post_id, $meta )) { update_post_meta( $post_id, $meta, $pokeData ); } 
         else { add_post_meta( $post_id, $meta, $pokeData, true ); }
     } else {

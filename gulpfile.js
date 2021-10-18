@@ -28,13 +28,14 @@ gulp.task('stylus', function(){
 
 gulp.task('browser-sync', function() {
   browserSync.init({
-    proxy: "https://pro-primetime-pokemon.local/"
+    proxy: "https://primetime-pokemon.local/"
   });
 });
 
 gulp.task('watch', function(){
     gulp.watch('src/styl/**/*.styl', gulp.series('stylus'));
     gulp.watch('**/*.php').on('change', browserSync.reload);
+    gulp.watch('../../themes/matthew-child/**/*.php').on('change', browserSync.reload);
 });
 
 gulp.task('default', gulp.parallel('stylus','browser-sync','watch'));

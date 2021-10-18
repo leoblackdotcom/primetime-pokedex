@@ -1,15 +1,58 @@
 @require('_index.styl')
 
 body
-    background #1b1b1b url(https://pro-primetime-pokemon.local/wp-content/uploads/2021/09/bg-main-ltr-2.jpg) no-repeat 50% 50%
-    background-size cover
+    background-color #1b1b1b
+    background-repeat repeat
+    background-position 0 0
+    font-family "Poppins", sans-serif
+    //color cast(#000223 50%)
 
 #page
-    background-color #fff
+    background none
+    @media(max-width 1000px)
+        padding-left 20px
+        padding-right 20px
+b, strong  
+    font-weight 700
 
 #content
     background #f4f4f4 url(https://pro-primetime-pokemon.local/wp-content/uploads/2021/09/bg-content-ltr-2d.jpg) repeat 0 0
     background-size 75% auto
+
+h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6
+    //font-family "Karantina", serif
+    font-family "Poppins", sans-serif
+    //text-transform uppercase
+    //font-weight 300
+    a
+        font-weight 400
+
+h2, .h2
+    font-size 32px
+    line-height 36px
+
+#content.site-content
+    padding 40px 0
+    body.home &
+        padding-top 0
+
+body.home .page .entry-title
+    display: none
+
+.home-banner
+    width 100%
+    min-height 500px
+    background-size cover
+    background-position 50% 50%
+    background-repeat no-repeat
+
+footer.site-footer
+    background #fff
+    border-radius 0 0 6px 6px
+    border-top 1px solid cast(black 12%)
+
+.site-content .sidebar-section
+    margin-top 0
 
 .storefront-breadcrumb
     display: none
@@ -32,13 +75,16 @@ a.button.no-margin
     margin-right auto
     text-align center
     padding-bottom 60px
-.poke-weaks
+#pokemon .poke-card.poke-weaks
     margin-top -20px
     h3
         font-weight 300!important
-        font-size 18px!important
-        line-height 30px!important
+        font-size 20px!important
+        line-height 24px!important
         letter-spacing .5px
+        border-color transparent!important
+        background none!important
+        top -26px
     ul
         &.poke-pills
             li
@@ -80,7 +126,7 @@ ul
             border 1px solid cast(black)
             border-width 1px 1px 2px 1px
             //text-shadow 0 1px 0 cast(black 25%)
-            &:before
+            /*&:before
                 content ""
                 bottom 0
                 left 0
@@ -95,7 +141,7 @@ ul
                 width 100%
                 height 3px
                 position absolute
-                background-color cast(white 20%)
+                background-color cast(white 20%)*/
             &.ice,
             &.electric
                 text-shadow none
@@ -127,14 +173,22 @@ ul
 #pokedex
     hug(90%)
     max-width 1200px
-    padding-top 60px
+    margin-top 20px
+    //padding-top 60px
     //background #fff
 
 #pokenav
     box(flex row nowrap, center center stretch, 200px 1 200px)
     text-align center
     margin-bottom 40px
-    padding 0 100px
+    padding 0 60px
+    //border 1px solid rgba(0,0,0,.12)
+    //border-width 1px 0
+    //border-radius 999px
+    //background-color cast(#f9f9f9 50%)
+    //backdrop-filter blur(4px)
+    @media(max-width 600px)
+        padding 0 60px
     & > .pokenav-link
         min-height 100px
         position relative
@@ -193,6 +247,8 @@ ul
                 border-radius 6px
                 position relative
                 z-index 3
+                @media(max-width 600px)
+                    display none
             .poke-nav-name
                 position absolute
                 top -10px
@@ -203,7 +259,7 @@ ul
                 padding 2px 4px
                 //background cast(black 60%)
                 border-radius 3px
-                font-size 14px
+                font-size 18px
                 font-weight bold
                 //color #fff
                 opacity .3
@@ -216,15 +272,25 @@ ul
             display block
             font-style italic
         .poke-name
-            font-family Karantina
-            font-size 36px
-            font-weight 300
+            font-size 16px
+            line-height 24px
+            font-weight 400
             //padding-bottom 6px
-            display block
-            line-height 36px
-            margin-bottom -5px
+            display inline-block
+            margin-top -10px
+            letter-spacing -1px
+            text-align right
+            color cast(#000223 30%)
+            b
+                display block
+                text-align center
+                margin-top -10px
+                padding 0 1em
+                font-size 24px
+                color #000223
             sup
                 font-weight 300
+                //margin-left -14px
         .poke-id
             font-size 24px
             line-height 24px
@@ -245,7 +311,7 @@ ul
     .swap-button
         position absolute
         top 18px
-        left 18px
+        left 0
         z-index 10
         //transform translateX(-50%)
         line-height 42px
@@ -265,23 +331,29 @@ ul
         //pointer-events none
         cursor pointer
         transition transform 0.3s
-        transform translateZ(200px) rotate(0deg)
+        transform translateZ(100px) rotate(0deg)
         svg
             transition transform 0.3s
         &:hover
             background #222
         &.activate
             background #222
-            transform translateZ(200px) rotate(90deg)
+            transform translateZ(100px) rotate(90deg)
             //border-color yellow
             svg
                 color cast(white 50%)
                 transform rotate(-90deg)
     .poke-profile
-        box(flex row wrap, space-between start, 50% 47% 100%)
+        box(flex row nowrap, space-between start, "1 0 50%" "1 0 47%" 100%)
+        @media(max-width 1000px)
+            box(flex column nowrap, stretch start, "0 1 90%")
     .poke-summary
         padding-top 40px
+        margin-left 3%
     .poke-image
+        max-width 50%
+        @media(max-width 1000px)
+            max-width 100%
         margin-bottom 30px
         perspective 2000px
         transform-style preserve-3d
@@ -295,7 +367,7 @@ ul
             top 0
             left 0
             width 100%
-            min-height 500px
+            min-height 600px
             //outline 2px solid blue
             display block
             //padding 40px
@@ -335,7 +407,7 @@ ul
                 padding 15px 20px
                 text-shadow -1px 1px 0px cast(black 10%), 0 2px 3px cast(black 10%)
                 //font-size 15px
-                font-weight 500
+                //font-weight 500
                 border 1px solid black
                 border-bottom-width 2px
                 span
@@ -366,10 +438,10 @@ ul
             box-shadow inset 0 0 40px rgba(0,0,0,.15)
             border 1px solid #000
             border-width 0 1px 2px 1px
-            min-height 500px
+            min-height 600px
             transition transform .5s ease
             backface-visibility hidden
-            margin-bottom 60px
+            margin-bottom 30px
             .poke-stats
                 & > ul li 
                         .poke-stats-bar-fill span
@@ -391,8 +463,8 @@ ul
                             border 1px solid white
                             border-bottom 0
             h1,h2
-                font-family Karantina
-                //font-weight 300
+                font-family Karantina!important
+                font-weight 400
                 letter-spacing 1px
                 font-size 48px
                 line-height 42px
@@ -444,7 +516,8 @@ ul
                 margin 130px 60px 90px
                 max-width 360px
                 max-height 360px
-                width 100%
+                width 90%
+                height auto
         .poke-stats
             position absolute
             bottom 0
@@ -542,7 +615,7 @@ ul
                     .poke-stats-spd
                         background cast(#65D53D 600 100%)
     .poke-card
-        border-radius 10px
+        border-radius 3px
         //overflow hidden
         //background-color cast(black 5%)
         background-color cast(white 50%)
@@ -552,6 +625,13 @@ ul
         position relative
         border 1px solid #000
         border-bottom-width 2px
+        &.poke-weaks,
+        &.poke-spells-hidden
+            h3
+                &:before
+                        content none
+        &.poke-spells
+            padding 15px
         &.poke-card-clean
             background none
             border none
@@ -561,8 +641,9 @@ ul
             width 47%
         &.poke-description
             p
-                font-weight 500
-                font-size 18px
+                //font-weight 500
+                padding 0 10px
+                //font-size 18px
                 svg
                     opacity .3
                 span
@@ -573,40 +654,71 @@ ul
 
         h3
             font-size 24px
-            font-weight bold
             position absolute
-            top -26px
-            left 0px
+            top -36px
+            left 0
+            //opacity .3
             //opacity .5
             text-transform uppercase
             font-family "Karantina"
             font-weight 400
+            letter-spacing 1px
+            //border-left 4px solid cast(black 12%)
+            padding-left 5px
+            //color cast(black 30%)
+            //background cast(#000223 90%)
+            //border-top 4px solid cast(#000223 10%)
+            //color cast(#000223 30%)
+            //background linear-gradient(90deg, #000223, rgba(0,0,0,.7))
+            //color #fff
+            padding 2px 6px
+            //border-radius 3px
+            width calc(100% + 2px)
+            &:before
+                position absolute
+                content ""
+                display block
+                width 100%
+                height 8px
+                background-color cast(#000223 10%)
+                background linear-gradient(90deg, rgba(0,2,35,.2) 0%, rgba(0,2,35,0) 50%)
+                border-radius 4px 0 0 4px
+                bottom 3px
+                left 0
+
 
         &.poke-details
             //margin-top -20px
+
+        &.poke-types
+            margin-bottom 60px
 
         &.poke-spells
             &.poke-spells-hidden
                 //border-color cast(black 30%)
                 //border-bottom-width 1px
                 background cast(tan 20%)
-                margin-top -10px
+                margin-top -13px
                 h3
                     letter-spacing .5px
                     font-weight 300
-                    font-size 18px
-                    line-height 30px
+                    font-size 20px
+                    line-height 24px
+                    border-color transparent
+                    color #000223
+                    //color cast(#000223 30%)
+                    background none
             h4 
                 font-size 16px
                 font-weight bold
                 margin-bottom 4px
                 display inline-block
             p
-                font-size 13px
+                font-size 14px
                 line-height 20px
-                font-weight 500
 
     ul.poke-details-list
+        padding 0 10px
         li
             box(flex row nowrap, start center, 0 1)
             padding 4px
@@ -633,7 +745,9 @@ ul
                     margin 4px 0 35px
                     padding-left 8px
                     border-radius 3px 3px 0 0
-                    box(flex row nowrap, start start, "1 0 180px" 1)
+                    box(flex row nowrap, start start, "1 0 180px" "999 1 auto")
+                    @media(max-width 600px)
+                        box(flex column nowrap, stretch start, "0 1 auto")
                     & > h4 
                         padding-right 14px
                     &:last-child
@@ -759,3 +873,302 @@ svg#Layer_1
             animation shine 6s infinite ease-in
             opacity .2
             background linear-gradient( to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(128,186,232,0) 99%, rgba(128,186,232,0) 100%)
+
+.site.container
+    margin-top 100px
+
+.notification-bar
+    display block
+    width 100%
+    text-align center
+    color #fff
+    position absolute
+    top -85px
+    left 0
+    font-size 13px
+    b
+        font-family monospace, monospace
+        color #F1D941
+        letter-spacing 1px
+        display inline-block
+        padding 0 4px 
+        border-radius 3px
+        background-color cast(white 12%)
+        cursor pointer
+
+.woocommerce-breadcrumb
+    display: none
+
+nav.main-navigation
+    margin-top -50px
+    text-align center
+    border-radius 6px 6px 0 0
+    background linear-gradient(90deg, #fff, #f7f7f7)
+    overflow hidden
+
+    ul.primary-menu
+        box(flex row nowrap, start stretch, 1)
+        li
+            padding 0 0 6px
+            margin 0
+            position relative
+            border 0!important
+            flex 0 1 300px
+            &:before
+                content ""
+                position absolute
+                top 0
+                left 0
+                height 44px
+                width 100%
+                background linear-gradient(90deg, #fbfbfb, #fff)
+                z-index 1
+                transition height .3s
+            &:hover
+                &:before
+                    height 0
+            a
+                outline 0
+                border 0
+                box-shadow none!important
+                display block
+                height 44px
+                line-height 46px
+                padding 0
+                font-size 16px
+                font-weight 600
+                text-transform uppercase
+                color #000054
+                border-radius 0
+                position relative
+                z-index 5
+                background none!important
+                &:before
+                    position absolute
+                    bottom 0
+                    left 0
+                    height 1px
+                    width 100%
+                    content ""
+                    display block
+                    background rgba(0,0,0,.08)
+                @media(max-width 1000px)
+                    font-size 14px
+            &:nth-child(5n+1) 
+                background cast(#DAD53D 50%)
+            &:nth-child(5n+2) 
+                background #D7F1FF
+            &:nth-child(5n+3) 
+                background #FFE8E8
+            &:nth-child(5n+4) 
+                background #D4DEBA
+            &:nth-child(5n+5) 
+                background #DAC5DD
+
+.site-header .site-branding
+    flex 0 1 200px
+
+.search-form__inner-container.th-max-w-prose
+    max-width none
+
+form.search-form
+    max-width 800px
+
+.site-branding a
+    display block
+    max-width 140px
+    margin-right 15px
+    outline 0
+    @media(max-width 600px)
+        margin 0 auto 20px
+
+
+header.site-header
+    padding 30px 30px
+    background #fff
+    border-bottom 1px solid cast(black 12%)
+    box(flex row nowrap, start center, 1)
+    @media(max-width 600px)
+        box(flex column nowrap center start)
+    .header-links
+        align-self center
+        .icons-menu
+            margin 0
+            width 100%
+            form
+                margin-left auto
+            &:before,
+            &:after
+                content none
+
+.search-form 
+    width 100%
+    position relative
+    .search-field
+        border-radius 24px
+        height 48px
+        line-height 48px
+        font-size 13px
+        color cast(#282828 50%)
+        min-width 360px
+        background #fff
+        border 0
+        box-shadow inset 0 3px 6px rgba(0,0,0,.08)
+        font-family Poppins, sans-serif
+        letter-spacing 0.25px
+        @media(max-width 600px)
+            width 100%
+            min-width 100%
+    .submit
+        display block
+        border-radius 0
+        border-radius 999px
+        padding 0
+        width 36px
+        height 36px
+        line-height 36px
+        position absolute
+        top 6px
+        right 6px
+        transition background 0.3s
+        margin 0
+        svg
+            width 32px!important
+            z-index 1
+            fill #fff
+            position relative
+
+body.archive,
+body.search
+    .page-header
+        display none
+    
+    article.pokedex
+        margin 10px 0
+        padding 0!important
+        border 1px solid cast(black 8%)
+        border-radius 0 6px 6px 0!important
+        overflow hidden
+        box-shadow 0 3px 5px cast(black 4%)
+        //flex-grow 1!important
+        margin 10px 1%
+        a:hover,
+        a:active
+            header.entry-header
+                opacity .6
+
+        header.entry-header
+            background linear-gradient(90deg, #f7f7f7, #fbfbfb)
+            border-left 2px solid cast(black 8%)
+            position relative
+            transition opacity .3s
+            span.pokemon-id
+                position absolute
+                //top 45%
+                top -5px
+                right 6px
+                font-size 48px
+                line-height 48px
+                color cast(black 10%)
+                //transform translateY(-50%)
+                font-family Karantina, serif
+                font-weight 400
+                background linear-gradient(205deg, #ddd, #666)
+                background-clip text
+                opacity .2
+        &:before
+            content none!important
+        header.entry-header
+            box(flex row nowrap, start center, 0 1)
+        img
+            max-width 60px
+            margin 10px 15px
+        h2
+            font-size 18px!important
+            //letter-spacing .25px
+            //font-weight 400
+            padding 0!important
+            font-family Poppins, sans-serif
+            text-transform none
+            font-weight 600
+
+    main.site-main
+        box(flex row wrap, start start stretch, 31%)
+        display flex!important
+        //padding-top 20px
+        min-height 500px
+        grid-column-gap 0!important
+        grid-template-columns none!important
+
+        & > *
+            @media(max-width 1000px)
+                flex-basis 48%
+            @media(max-width 600px)
+                flex-basis 100%
+
+
+nav.navigation.pagination
+    flex 1 0 100%!important
+    margin-bottom 60px
+    text-align center
+    box(flex row nowrap, center stretch, 1)
+
+.navigation.pagination .page-numbers
+    float none
+    display inline-block
+    margin-bottom 10px
+    font-family Karantina, serif
+    font-size 22px
+    @media(max-width 1000px)
+        min-width 12px
+        height 36px
+        line-height 36px
+        margin-left 5px
+
+ul#site-header-cart
+    margin-left 10px
+    li
+        padding-top 2px
+        a
+            display block
+            position relative
+            width 42px
+            height 42px
+            line-height 42px
+            text-align center
+            margin 0
+            background cast(#005aa4 10%)
+            //border 1px solid rgba(0,0,0,.12)
+            //box-shadow 0 3px 2px rgba(0,0,0,.2)
+            border-radius 999px
+            transition background-color 0.3s
+
+            &:hover,
+            &:active
+                background cast(#005aa4 20%)
+
+                svg
+                    color #005aa4
+
+            svg
+                color #999
+                transition all 0.3s
+
+            span
+                position absolute
+                top -4px
+                right -4px
+                background #FDBF23
+                color #005aa4
+                display inline-block
+                border-radius 999px
+                line-height 16px
+                width 16px
+                text-align center
+                font-size 10px
+                font-weight bold
+                border 1px solid #fff
+
+                &:before,
+                &:after
+                    content none
